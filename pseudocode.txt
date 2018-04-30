@@ -1,0 +1,63 @@
+public class Encrypt
+{
+	img coverImage;
+	img toEmbedImage;
+	img cipher;
+	int base;
+	int groupSize;
+
+	public boolean isSizeSufficient()
+	{
+		// Taşıyıcı resim boyutunun yeterli boyutta olup olmadığını kontrol et
+ 		// Mod işlemleri için tabanı belirle
+	}
+
+	public img encrypt()
+	{
+		for(int row = 0; row < toEmbedImage.height(); row++)
+		{
+			for(int column = 0; column < toEmbedImage.width(); column++)
+			{
+				// pikseli al ve sifreleme tabanina cevir
+				int pixel = toEmbedImage.getPixel(column, row);
+				String cipherPixel = Integer.toString(pixel, base);
+
+				// Gerekiyorsa padding yap
+				if(cipherPixel.size() < Integer.toString(255, base).size())
+				{
+					int diff = Integer.toString(255, base).size() - cipherPixel.size();
+				}		
+				
+				// Her bir digiti taşıyıcı resme göm
+				for(int i = 0; i < cipherPixel.length; i++)
+				{
+					int embeddingPixel = Integer.valueOf(cipherPixel.charAt(i));
+					// satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
+					int index = row * toEmbedImage.width() + column;
+					embed(embeddingPixel, index);
+				}
+			}
+		}
+	}
+
+	private void embed(embeddingPixel, index)
+	{
+		int weightedSum = 0;
+		int difference;
+		
+		// fonksiyonun sonucunu hesapla
+		for(int i = 1; i <= groupSize; i++)
+			weightedSum += (coverImage.getPixel(column, row) * i) % base;
+		// fark negatifse pozitife cevir
+		difference = (embeddingPixel - weightedSum + base) % base;
+
+		index = index + difference - 1;
+		column = index / coverImage.width();
+		row = index % coverImage.width();
+
+		if(difference < groupSize)
+			coverImage.setPixel(column, row , coverImage.getPixel(column, row) + 1);
+		else
+			coverImage.setPixel(column, row, coverImage.getPixel(column, row) - 1); 
+
+	}			  
