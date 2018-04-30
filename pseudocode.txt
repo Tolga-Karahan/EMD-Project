@@ -9,7 +9,8 @@ public class Encrypt
 	public boolean isSizeSufficient()
 	{
 		// Taşıyıcı resim boyutunun yeterli boyutta olup olmadığını kontrol et
- 		// Mod işlemleri için tabanı belirle
+ 		// Mod işlemleri için tabanı (2n+1) olacak sekilde belirle
+		// Her bir digitin gomulecegi grup buyuklugunu n olacak sekilde belirle
 	}
 
 	public img encrypt()
@@ -26,6 +27,8 @@ public class Encrypt
 				if(cipherPixel.size() < Integer.toString(255, base).size())
 				{
 					int diff = Integer.toString(255, base).size() - cipherPixel.size();
+					for(int i = 0; i < diff; i++)
+						"0" + cipherPixel;
 				}		
 				
 				// Her bir digiti taşıyıcı resme göm
@@ -47,17 +50,23 @@ public class Encrypt
 		
 		// fonksiyonun sonucunu hesapla
 		for(int i = 1; i <= groupSize; i++)
-			weightedSum += (coverImage.getPixel(column, row) * i) % base;
+			weightedSum += (coverImage.getPixel(index / coverImage.width(), index % coverImage.width()) * i) % base;
+		
 		// fark negatifse pozitife cevir
 		difference = (embeddingPixel - weightedSum + base) % base;
 
-		index = index + difference - 1;
-		column = index / coverImage.width();
-		row = index % coverImage.width();
+		// fark 0 ise islem yapmaya gerek yok
+		difference == 0 ? return : ;
+                
+                // fark n den buyukse (2n + 1) - farkı al		
+		index = difference > groupSize ? index + (base - difference) - 1:index + difference - 1;    
+                int column = index % coverImage.width();
+                int row = index / coverImage.width();
 
-		if(difference < groupSize)
+		// fark n den kucukse ilgili pikseli arttir, n den buyukse ilgili pikseli azalt
+		if(difference <= groupSize)
 			coverImage.setPixel(column, row , coverImage.getPixel(column, row) + 1);
 		else
-			coverImage.setPixel(column, row, coverImage.getPixel(column, row) - 1); 
-
-	}			  
+      			coverImage.setPixel(column, row, coverImage.getPixel(column, row) - 1); 
+	}
+}			  
