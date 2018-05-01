@@ -1,16 +1,39 @@
 public class Encrypt
 {
-	img coverImage;
-	img toEmbedImage;
-	img cipher;
-	int base;
-	int groupSize;
+	img coverImage; // orten resim
+	img toEmbedImage; // gizli resim
+	int base; //(2n+1) sifreleme tabani
+	int groupSize; // sifrelemede kullanilacak n piksel sayisi 
+	Dim dimension; // gizli resmin boyutu
+
+	public Encrypt(img coverImage, img toEmbedImage) throws Exception
+	{
+		this.coverImage = coverImage;
+		this.toEmbedImage = toEmbedImage;
+		if(!isSizeSufficient())
+			throw new Exception("Size isn't sufficient");
+	}
 
 	public boolean isSizeSufficient()
 	{
 		// Taşıyıcı resim boyutunun yeterli boyutta olup olmadığını kontrol et
+		if(coverImage.getHeight() * coverImage.getWidth() < toEmbedImage.getHeight() * toEmbedImage.getWidth() * 8)
+			return false;
  		// Mod işlemleri için tabanı (2n+1) olacak sekilde belirle
 		// Her bir digitin gomulecegi grup buyuklugunu n olacak sekilde belirle
+
+		if(coverImage.getHeight() * coverImage.getWidth() >= toEmbedImage.getHeight() * toEmbedImage.getWidth() * 9)
+		{
+			base = 7;
+			groupSize = 3;
+			return true;
+		}
+		else
+		{
+			base = 5;
+			groupSize = 2;
+			return true;
+		}				
 	}
 
 	public img encrypt()
@@ -24,36 +47,36 @@ public class Encrypt
 				String cipherPixel = Integer.toString(pixel, base);
 
 				// Gerekiyorsa padding yap
-				if(cipherPixel.size() < Integer.toString(255, base).size())
+				if(cipherPixel.length() < Integer.toString(255, base).length())
 				{
-					int diff = Integer.toString(255, base).size() - cipherPixel.size();
+					int diff = Integer.toString(255, base).length() - cipherPixel.length();
 					for(int i = 0; i < diff; i++)
-						"0" + cipherPixel;
+						cipherPixel = "0" + cipherPixel;
 				}		
 				
 				// Her bir digiti taşıyıcı resme göm
-				for(int i = 0; i < cipherPixel.length; i++)
+				for(int i = 0; i < cipherPixel.length(); i++)
 				{
-					int embeddingPixel = Integer.valueOf(cipherPixel.charAt(i));
+					int embeddingDigit = Integer.valueOf(cipherPixel.charAt(i));
 					// satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
 					int index = row * toEmbedImage.width() + column;
-					embed(embeddingPixel, index);
+					embed(embeddingDigit, index + i * groupSize);
 				}
 			}
 		}
 	}
 
-	private void embed(embeddingPixel, index)
+	private void embed(embeddingDigit, index)
 	{
 		int weightedSum = 0;
 		int difference;
 		
 		// fonksiyonun sonucunu hesapla
-		for(int i = 1; i <= groupSize; i++)
-			weightedSum += (coverImage.getPixel(index / coverImage.width(), index % coverImage.width()) * i) % base;
+		for(int i = 0; i < groupSize; i++)
+			weightedSum += (coverImage.getPixel((index + i) % coverImage.width(), (index + i) / coverImage.width()) * (i + 1)) % base;
 		
-		// fark negatifse pozitife cevir
-		difference = (embeddingPixel - weightedSum + base) % base;
+		// farki bul, negatifse pozitife cevir
+		difference = (embeddingDigit - weightedSum + base) % base;
 
 		// fark 0 ise islem yapmaya gerek yok
 		difference == 0 ? return : ;
