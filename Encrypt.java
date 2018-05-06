@@ -54,9 +54,9 @@ public class Encrypt
 			for(int column = 0; column < secretImage.getWidth(); column++)
 			{
 				// Pikseli al ve sifreleme tabanina cevir
-				int pixel = secretImage.getSample(row, column, 0);
+				int pixel = secretImage.getSample(column, row, 0);
 				String cipherPixel = Integer.toString(pixel, base);
-i	//			System.out.println(cipherPixel + "\t" + ++debug);	
+;	
 				// Gerekiyorsa padding yap
 				if(cipherPixel.length() < Integer.toString(255, base).length())
 				{
@@ -69,7 +69,7 @@ i	//			System.out.println(cipherPixel + "\t" + ++debug);
 				// Her bir digiti taşıyıcı resme göm
 				for(int i = 0; i < cipherPixel.length(); i++)
 				{
-					int embeddingDigit = Integer.valueOf(cipherPixel.charAt(i));
+					int embeddingDigit = Character.getNumericValue(cipherPixel.charAt(i));
 					// Satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
 					int index = (row * secretImage.getWidth() + column) * factor;
 					embed(embeddingDigit, index + i * groupSize);
@@ -88,7 +88,7 @@ i	//			System.out.println(cipherPixel + "\t" + ++debug);
 		
 		// Fonksiyonun sonucunu hesapla
 		for(int i = 0; i < groupSize; i++)
-			weightedSum += coverImage.getSample((index + i) / coverImage.getWidth(), (index + i) % coverImage.getWidth(), 0) * (i + 1) % base;
+			weightedSum += coverImage.getSample((index + i) % coverImage.getWidth(), (index + i) / coverImage.getWidth(), 0) * (i + 1) % base;
 		
 		// Farki bul, negatifse pozitife cevir
 		difference = (embeddingDigit - weightedSum + base) % base;
@@ -107,12 +107,12 @@ i	//			System.out.println(cipherPixel + "\t" + ++debug);
 		// PSNR basitce arttirma islemi ile hesaplanabilir ve sonuc en son normalize edilir
 		if(difference <= groupSize)
 		{
-			coverImage.setSample(row, column, 0, coverImage.getSample(row, column, 0) + 1);
+			coverImage.setSample(column, row, 0, coverImage.getSample(column, row, 0) + 1);
 			PSNR++;
 		}
 		else
 		{
-      			coverImage.setSample(row, column, 0, coverImage.getSample(row, column, 0) - 1);
+      			coverImage.setSample(column, row, 0, coverImage.getSample(column, row, 0) - 1);
 			PSNR++;
 		} 
 	}
