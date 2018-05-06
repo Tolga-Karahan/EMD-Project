@@ -1,28 +1,33 @@
 public class Encrypt
 {
-	img coverImage; // orten resim
-	img toEmbedImage; // gizli resim
-	int base; //(2n+1) sifreleme tabani
-	int groupSize; // sifrelemede kullanilacak n piksel sayisi 
-	Dim dimension; // gizli resmin boyutu
+	img coverImage;      // Orten resim
+	img secretImage;     // Gizli resim
+	int base;            // (2n+1) sifreleme tabani
+	int groupSize;       // Sifrelemede kullanilacak n piksel sayisi 
+	int factor;          // Her bir pikselin sifrelenmesinde kullanilacak piksel sayisi
+	double PSNR;         // Peak signal to noise ratio
 
-	public Encrypt(img coverImage, img toEmbedImage) throws Exception
+	public Encrypt(img coverImage, img secretImage) throws Exception
 	{
 		this.coverImage = coverImage;
-		this.toEmbedImage = toEmbedImage;
+		this.secretImage = secretImage;
+
 		if(!isSizeSufficient())
 			throw new Exception("Size isn't sufficient");
+		
+		factor = base == 5 ? 8 : 9;		
+		PSNR = 0;
 	}
 
 	public boolean isSizeSufficient()
 	{
-		// Taşıyıcı resim boyutunun yeterli boyutta olup olmadığını kontrol et
-		if(coverImage.getHeight() * coverImage.getWidth() < toEmbedImage.getHeight() * toEmbedImage.getWidth() * 8)
+		// Orten resim boyutunun yeterli boyutta olup olmadığını kontrol et
+		if(coverImage.getHeight() * coverImage.getWidth() < secretImage.getHeight() * secretImage.getWidth() * 8)
 			return false;
- 		// Mod işlemleri için tabanı (2n+1) olacak sekilde belirle
+ 		
+		// Mod işlemleri için tabanı (2n+1) olacak sekilde belirle
 		// Her bir digitin gomulecegi grup buyuklugunu n olacak sekilde belirle
-
-		if(coverImage.getHeight() * coverImage.getWidth() >= toEmbedImage.getHeight() * toEmbedImage.getWidth() * 9)
+		if(coverImage.getHeight() * coverImage.getWidth() >= secretImage.getHeight() * secretImage.getWidth() * 9)
 		{
 			base = 7;
 			groupSize = 3;
@@ -33,17 +38,18 @@ public class Encrypt
 			base = 5;
 			groupSize = 2;
 			return true;
-		}				
+		}
+				
 	}
 
 	public img encrypt()
 	{
-		for(int row = 0; row < toEmbedImage.height(); row++)
+		for(int row = 0; row < secretImage.height(); row++)
 		{
-			for(int column = 0; column < toEmbedImage.width(); column++)
+			for(int column = 0; column < secretImage.width(); column++)
 			{
-				// pikseli al ve sifreleme tabanina cevir
-				int pixel = toEmbedImage.getPixel(column, row);
+				// Pikseli al ve sifreleme tabanina cevir
+				int pixel = secretImage.getPixel(column, row);
 				String cipherPixel = Integer.toString(pixel, base);
 
 				// Gerekiyorsa padding yap
@@ -58,8 +64,8 @@ public class Encrypt
 				for(int i = 0; i < cipherPixel.length(); i++)
 				{
 					int embeddingDigit = Integer.valueOf(cipherPixel.charAt(i));
-					// satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
-					int index = row * toEmbedImage.width() + column;
+					// Satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
+					int index = (row * secretImage.width() + column) * factor;
 					embed(embeddingDigit, index + i * groupSize);
 				}
 			}
@@ -71,25 +77,39 @@ public class Encrypt
 		int weightedSum = 0;
 		int difference;
 		
-		// fonksiyonun sonucunu hesapla
+		// Fonksiyonun sonucunu hesapla
 		for(int i = 0; i < groupSize; i++)
 			weightedSum += (coverImage.getPixel((index + i) % coverImage.width(), (index + i) / coverImage.width()) * (i + 1)) % base;
 		
-		// farki bul, negatifse pozitife cevir
+		// Farki bul, negatifse pozitife cevir
 		difference = (embeddingDigit - weightedSum + base) % base;
 
-		// fark 0 ise islem yapmaya gerek yok
-		difference == 0 ? return : ;
+		// Fark 0 ise islem yapmaya gerek yok
+		if(difference == 0)
+			return;
                 
-                // fark n den buyukse (2n + 1) - farkı al		
-		index = difference > groupSize ? index + (base - difference) - 1:index + difference - 1;    
+                // Fark n den buyukse (2n + 1) - farkı al		
+		index = difference > groupSize ? index + (base - difference) - 1 : index + difference - 1;    
                 int column = index % coverImage.width();
                 int row = index / coverImage.width();
 
-		// fark n den kucukse ilgili pikseli arttir, n den buyukse ilgili pikseli azalt
+		// Fark n den kucukse ilgili pikseli arttir, n den buyukse ilgili pikseli azalt
+		// Piksellerde en fazla fark 1 olacak sekilde degisiklik yaptigimizdan
+		// PSNR basitce arttirma islemi ile hesaplanabilir ve sonuc en son normalize edilir
 		if(difference <= groupSize)
+		{
 			coverImage.setPixel(column, row , coverImage.getPixel(column, row) + 1);
+			PSNR++;
+		}
 		else
-      			coverImage.setPixel(column, row, coverImage.getPixel(column, row) - 1); 
+		{
+      			coverImage.setPixel(column, row, coverImage.getPixel(column, row) - 1);
+			PSNR++;
+		} 
+	}
+	
+	public double getPSNR()
+	{
+		return PSNR / (coverImage.getWidth() * coverImage.getHeight());
 	}
 }			  
