@@ -1,0 +1,64 @@
+public class Decrypt
+{
+	img coverImage; // orten resim
+	img secretImage; // gizli resim
+	int base; // sifrelenirken kullanilan taban
+	int groupSize; // grup buyuklugu
+	int groupNumber; // grup sayisi
+	int factor;      // Orten resmin kac kat daha buyuk
+	Dimension dimension; // gizli resmin boyutu
+	
+
+	public Decrypt(img coverImage, int base, int groupSize, Dimension dimension)
+	{
+		this.coverImage = coverImage;
+		this.base = base;
+		this.groupSize = groupSize;
+		this.dimension = dimension;
+
+		secretImage = new BufferedImage(dimension.getX(), dimension.getY());
+		groupNumber = Integer.toString(255, base).length();
+		int factor = base == 5 ? 8 : 9;
+	}
+
+	public decrypt()
+	{
+		String pixel = "";		// Her bir digit cikartilip birlestirilecek
+
+		for(int row = 0; row < dimension.getX(); row++)
+		{
+			for(int column = 0; column < dimension.getY(); column++)
+			{
+				// Her bir digiti cikart
+				for(int i = 0; i < groupNumber; i++)
+				{
+					// Tek boyutta indeksle
+					// Gizli resimdeki her bir piksel factor degiskeniyle belirtilen 
+					// sayida piksele gizleniyor
+					int index = (row * dimension.getY() + column) * factor;
+					char digit  = extract((index + (groupSize * i));
+					pixel += pixel + digit;	
+				}
+				secretImage.setPixel(column, row, Integer.parseInt(pixel, 10));
+			}
+		}
+
+
+	}
+	
+	private char extract(int index)
+	{
+		char digit = 0;		
+		int column = index % coverImage.getY();
+                int row    = index / coverImage.getY();
+		
+		for(int i = 0; i < groupSize; i++)
+		{
+
+			digit += (i + 1) * coverImage.getPixel(column, row) % base;
+		}
+
+		return digit;
+	}
+}			
+			
