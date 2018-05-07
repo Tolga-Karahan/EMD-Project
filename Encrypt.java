@@ -11,7 +11,6 @@ public class Encrypt
 	private int base;        	       	// (2n+1) sifreleme tabani
 	private int groupSize;       	       	// Sifrelemede kullanilacak n piksel sayisi 
 	private int factor;          	       	// Her bir pikselin sifrelenmesinde kullanilacak piksel sayisi
-	private double PSNR;                   	// Peak signal to noise ratio
 	
 	public Encrypt(BufferedImage coverImage, BufferedImage secretImage) throws Exception
 	{
@@ -24,7 +23,6 @@ public class Encrypt
 			throw new Exception("Size isn't sufficient");
 		
 		factor = base == 5 ? 8 : 9;		
-		PSNR = 0;
 	}
 
 	public boolean isSizeSufficient()
@@ -112,12 +110,10 @@ public class Encrypt
 		if(difference <= groupSize)
 		{
 			coverImage.setSample(column, row, 0, coverImage.getSample(column, row, 0) + 1);
-			PSNR++;
 		}
 		else
 		{
       			coverImage.setSample(column, row, 0, coverImage.getSample(column, row, 0) - 1);
-			PSNR++;
 		} 
 	}
 	
