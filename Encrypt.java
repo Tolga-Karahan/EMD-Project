@@ -4,6 +4,7 @@ import java.awt.image.ColorModel;
 
 public class Encrypt
 { 
+	private BufferedImage unmodifiedImage;  // PSNR hesaplamak icin resmin ilk halini kaydet
 	private ColorModel model;		// Orten resmin renk modeli
 	private WritableRaster coverImage;      // Orten resim
 	private WritableRaster secretImage;     // Gizli resim
@@ -14,6 +15,7 @@ public class Encrypt
 	
 	public Encrypt(BufferedImage coverImage, BufferedImage secretImage) throws Exception
 	{
+		this.unmodifiedImage = coverImage;
 		this.model = coverImage.getColorModel();
 		this.coverImage = coverImage.getRaster();
 		this.secretImage = secretImage.getRaster();
@@ -90,8 +92,10 @@ public class Encrypt
 		
 		// Fonksiyonun sonucunu hesapla
 		for(int i = 0; i < groupSize; i++)
-			weightedSum += ((coverImage.getSample((index + i) % coverImage.getWidth(), (index + i) / coverImage.getWidth(), 0)) * (i + 1)) % base;
-		
+			weightedSum += ((coverImage.getSample((index + i) % coverImage.getWidth(), (index + i) / coverImage.getWidth(), 0)) * (i + 1));
+		// sonucun tabana gore modunu al
+		weightedSum %= base;
+	
 		// Farki bul, negatifse pozitife cevir
 		difference = (embeddingDigit - weightedSum + base) % base;
 
@@ -105,8 +109,6 @@ public class Encrypt
                 int row = index / coverImage.getWidth();
 
 		// Fark n den kucukse ilgili pikseli arttir, n den buyukse ilgili pikseli azalt
-		// Piksellerde en fazla fark 1 olacak sekilde degisiklik yaptigimizdan
-		// PSNR basitce arttirma islemi ile hesaplanabilir ve sonuc en son normalize edilir
 		if(difference <= groupSize)
 		{
 			coverImage.setSample(column, row, 0, coverImage.getSample(column, row, 0) + 1);
@@ -121,6 +123,22 @@ public class Encrypt
 	
 	public double getPSNR()
 	{
-		return PSNR / (coverImage.getWidth() * coverImage.getHeight());
-	}
+		WritableRaster unmodifiedImageRaster = unmodifiedImage.getRaster();
+		double PSNR = 0;
+
+		for(int row = 0; row < unmodifiedImageRaster.getHeight(); row++)
+		{
+			for(int column = 0; column < unmodifiedImageRaster.getHeight(); column++)
+			{
+				// Orten resmin ilk hali ile degistirilmis halindeki piksellerin farkini al
+				// karesini PSNR ye ekle
+				int difference = unmodifiedImageRaster.getSample(column, row, 0) -
+					coverImage.getSample(column, row, 0);
+				PSNR += Math.pow(difference, 2);
+			}
+		}
+		
+		// PSNR degerini normalize et ve dondur
+		return PSNR / (unmodifiedImageRaster.getHeight() * unmodifiedImageRaster.getWidth());
+	}	
 }			  
