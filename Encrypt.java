@@ -1,16 +1,17 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
+
 public class Encrypt
 { 
-	ColorModel model;
-	WritableRaster coverImage;      // Orten resim
-	WritableRaster secretImage;     // Gizli resim
-	int base;        	       	// (2n+1) sifreleme tabani
-	int groupSize;       	       	// Sifrelemede kullanilacak n piksel sayisi 
-	int factor;          	       	// Her bir pikselin sifrelenmesinde kullanilacak piksel sayisi
-	double PSNR;                   	// Peak signal to noise ratio
-	int debug = 0;
+	private ColorModel model;		// Orten resmin renk modeli
+	private WritableRaster coverImage;      // Orten resim
+	private WritableRaster secretImage;     // Gizli resim
+	private int base;        	       	// (2n+1) sifreleme tabani
+	private int groupSize;       	       	// Sifrelemede kullanilacak n piksel sayisi 
+	private int factor;          	       	// Her bir pikselin sifrelenmesinde kullanilacak piksel sayisi
+	private double PSNR;                   	// Peak signal to noise ratio
+	
 	public Encrypt(BufferedImage coverImage, BufferedImage secretImage) throws Exception
 	{
 		this.model = coverImage.getColorModel();
@@ -78,6 +79,7 @@ public class Encrypt
 			
 			}
 		}
+
 		return new BufferedImage(model, coverImage, model.isAlphaPremultiplied(), null); 
 	}
 
@@ -88,7 +90,7 @@ public class Encrypt
 		
 		// Fonksiyonun sonucunu hesapla
 		for(int i = 0; i < groupSize; i++)
-			weightedSum += coverImage.getSample((index + i) % coverImage.getWidth(), (index + i) / coverImage.getWidth(), 0) * (i + 1) % base;
+			weightedSum += ((coverImage.getSample((index + i) % coverImage.getWidth(), (index + i) / coverImage.getWidth(), 0)) * (i + 1)) % base;
 		
 		// Farki bul, negatifse pozitife cevir
 		difference = (embeddingDigit - weightedSum + base) % base;
