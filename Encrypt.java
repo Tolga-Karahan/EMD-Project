@@ -73,7 +73,7 @@ public class Encrypt
 		// Fonksiyonun sonucunu hesapla
 		for(int i = 0; i < groupSize; i++)
 			weightedSum += ((coverImage.getSample((index + i) % coverImage.getWidth(), (index + i) / coverImage.getWidth(), band)) * (i + 1));
-		// sonucun tabana gore modunu al
+		// Sonucun tabana gore modunu al
 		weightedSum %= base;
 	
 		// Farki bul, negatifse pozitife cevir
@@ -122,9 +122,9 @@ public class Encrypt
                 for(int i = 0; i < cipherPixel.length(); i++)
                 {
                 	int embeddingDigit = Character.getNumericValue(cipherPixel.charAt(i));
-                        
+
 			// Sifreleme tabanindaki her bir digit orten resme gomulur 
-                        embedDigit(embeddingDigit, index + i * groupSize, band);
+                        embedDigit(embeddingDigit, index + (i * groupSize), band);
                 }
 	}
 	

@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package emd;
+
+/**
+ *
+ * @author Tolga
+ */
+
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
@@ -19,9 +31,9 @@ public class Decrypt
 		this.model  	 = secretImage.getColorModel();
 		this.base        = coverImage.getWidth() * coverImage.getHeight() < 
 			9 * secretImage.getWidth() * secretImage.getHeight() ? 5 : 7; 
+                this.groupSize   = base == 5 ? 2 : 3;
 		this.groupNumber = Integer.toString(255, base).length();
 		this.factor 	 = base == 5 ? 8 : 9;
-		this.groupSize   = base == 5 ? 2 : 3;
 	}
 
 	public BufferedImage decrypt()
@@ -42,9 +54,9 @@ public class Decrypt
 				// Piksel degerlerini yerine koy
 				// Gri resimler icin heyecan yapmaya gerek yok
 				// gri resimlerde tum bu degerler aynidir
-				secretImage.setSample(column, row, 0, blue);
+				secretImage.setSample(column, row, 0, red);
 				secretImage.setSample(column, row, 1, green);
-				secretImage.setSample(column, row, 2, red);
+				secretImage.setSample(column, row, 2, blue);
 			}
 		}
 
@@ -58,8 +70,8 @@ public class Decrypt
 		for(int i = 0; i < groupSize; i++)
 		{
 
-			weightedSum += (i + 1) * coverImage.getSample((index % coverImage.getWidth() + i),
-								      (index / coverImage.getWidth() + i),
+			weightedSum += (i + 1) * coverImage.getSample((index + i) % coverImage.getWidth(),
+								      (index + i) / coverImage.getWidth(),
 								      band);
 		}
 
@@ -74,7 +86,7 @@ public class Decrypt
                 for(int i = 0; i < groupNumber; i++)
                 {
               		// Piksele ait her bir digiti cikart ve onluk tabana cevirerek piksel degerine ekle
-                	pixel += Math.pow(base, groupSize - i - 1) * extractionFunction(index + (groupSize * i), band);
+                	pixel += Math.pow(base, (groupNumber - i - 1)) * extractionFunction(index + (groupSize * i), band);
                 }
         	
 		// Onluk tabanda piksel degerini dondur

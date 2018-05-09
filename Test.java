@@ -8,18 +8,24 @@ public class Test
 	{
 		try
 		{
-			BufferedImage input = ImageIO.read(new File("input.png"));
-			BufferedImage coverImage = ImageIO.read(new File("cover-image.jpg"));
+			BufferedImage input = ImageIO.read(new File(
+				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//secret//input.jpg"));
+			BufferedImage coverImage = ImageIO.read(new File(
+				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//cover//cover-image.jpg"));
 
 			Encrypt encryption = new Encrypt(coverImage, input);
 			BufferedImage output = encryption.encrypt();
 
-			ImageIO.write(output, "JPEG", new File("output.jpg"));
+			ImageIO.write(output, "JPEG", new File(
+				"//home//apeiron//Documents//myRepos//EMD-Project//images//output-images//modified-cover//output.jpg"));
 
-			Decrypt decryption = new Decrypt(coverImage, input);
+			Decrypt decryption = new Decrypt(coverImage, new BufferedImage(input.getWidth(),
+										       input.getHeight(),
+										       BufferedImage.TYPE_INT_RGB));
 			BufferedImage secret = decryption.decrypt();
 
-			ImageIO.write(secret, "JPEG", new File("secret.jpg"));
+			ImageIO.write(secret, "JPEG", new File(
+				"//home//apeiron//Documents//myRepos//EMD-Project//images//output-images//output-secret//secret.jpg"));		
 		}
 		catch(Exception e)
 		{
