@@ -9,7 +9,7 @@ public class Test
 		try
 		{
 			BufferedImage input = ImageIO.read(new File(
-				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//secret//input.jpg"));
+				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//secret//rgbinput2.jpg"));
 			BufferedImage coverImage = ImageIO.read(new File(
 				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//cover//cover-image.jpg"));
 
@@ -19,9 +19,7 @@ public class Test
 			ImageIO.write(output, "JPEG", new File(
 				"//home//apeiron//Documents//myRepos//EMD-Project//images//output-images//modified-cover//output.jpg"));
 
-			Decrypt decryption = new Decrypt(coverImage, new BufferedImage(input.getWidth(),
-										       input.getHeight(),
-										       BufferedImage.TYPE_INT_RGB));
+			Decrypt decryption = new Decrypt(coverImage);
 			BufferedImage secret = decryption.decrypt();
 
 			ImageIO.write(secret, "JPEG", new File(
