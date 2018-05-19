@@ -1,15 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package emd;
-
-/**
- *
- * @author Tolga
- */
-
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
@@ -19,22 +7,43 @@ public class Decrypt
 	private WritableRaster coverImage; 	// Orten resim
 	private WritableRaster secretImage;     // Gizli resim
 	private ColorModel model;		// Gizli resmin renk modeli
+	private int Width;		        // Gizli resmin sutun sayisi
+	private int Height;			// Gizli resmin satir sayisi
 	private int base;                       // Sifrelemede kullanilan taban
 	private int groupSize;                  // Grup buyuklugu
 	private int groupNumber;                // Grup sayisi
 	private int factor;                     // Sifrelemede her pikselin saklandigi piksel sayisi 
 
-	public Decrypt(BufferedImage coverImage, BufferedImage secretImage)
+	public Decrypt(BufferedImage coverImage)
 	{
-		this.coverImage  = coverImage.getRaster();
-		this.secretImage = secretImage.getRaster();
-		this.model  	 = secretImage.getColorModel();
+		this.coverImage  = coverImage.getRaster();	
+
+		// Gizli resmin satir ve sutun sayisini cikart
+		extractSize();
+		
+		this.secretImage = new BufferedImage(Width, Height, BufferedImage.TYPE_INT_RGB).getRaster();
+		this.model       = new BufferedImage(Width, Height, BufferedImage.TYPE_INT_RGB).getColorModel();
 		this.base        = coverImage.getWidth() * coverImage.getHeight() < 
 			9 * secretImage.getWidth() * secretImage.getHeight() ? 5 : 7; 
                 this.groupSize   = base == 5 ? 2 : 3;
 		this.groupNumber = Integer.toString(255, base).length();
 		this.factor 	 = base == 5 ? 8 : 9;
 	}
+	
+	public void extractSize()
+	{
+		String row = "";
+		String column = "";
+
+		for(int i = 0; i < 4; i++)
+		{
+			row = row + coverImage.getSample(i, 0, 0);
+			column = column + coverImage.getSample(i + 4, 0, 0);
+		}
+
+		this.Width = Integer.parseInt(column);
+		this.Height = Integer.parseInt(row);
+	}	
 
 	public BufferedImage decrypt()
 	{	
@@ -44,7 +53,7 @@ public class Decrypt
 			for(int column = 0; column < secretImage.getWidth(); column++)
 			{
 				// Tek boyutta indeksle
-				int index = (row * secretImage.getWidth() + column) * factor;
+				int index = ((row * secretImage.getWidth() + column) + 1) * factor;
 				
 				// Her bir piksel degerini cikart
 				int red   = extractPixel(index, 0);

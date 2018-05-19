@@ -23,7 +23,27 @@ public class Encrypt
 			throw new Exception("Size isn't sufficient");
 		
 		factor    = base == 5 ? 8 : 9;	
+
+		// Resim boyutlarini ilk piksellere gom
+		embedSize();
 			
+	}
+
+	public void embedSize()
+	{
+		String row = String.valueOf(secretImage.getHeight());
+		String column = String.valueOf(secretImage.getWidth());
+
+		if(row.length() < 4) 
+			row = "0" + row;
+		if(column.length() < 4)
+			column = "0" + column;
+
+		for(int i = 0; i < 4; i++)
+		{
+			coverImage.setSample(i, 0, 0, Integer.valueOf(Character.getNumericValue(row.charAt(i))));
+			coverImage.setSample(i + 4, 0, 0, Integer.valueOf(Character.getNumericValue(column.charAt(i))));
+		}		 	
 	}
 
 	public boolean isSizeSufficient()
@@ -65,6 +85,35 @@ public class Encrypt
 		return new BufferedImage(model, coverImage, model.isAlphaPremultiplied(), null); 
 	}
 
+	private void embedPixel(int column, int row, int band)
+	{
+
+		// Satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
+		int index = ((row * secretImage.getWidth() + column) + 1) * factor;
+
+		// Pikseli al ve sifreleme tabanina cevir
+                int pixel = secretImage.getSample(column, row, band);
+                String cipherPixel = Integer.toString(pixel, base);
+
+                // Gerekiyorsa padding yap
+                if(cipherPixel.length() < Integer.toString(255, base).length())
+                {
+       	        	int diff = Integer.toString(255, base).length() - cipherPixel.length();
+
+                        for(int i = 0; i < diff; i++)
+                        	cipherPixel = '0' + cipherPixel;
+                }
+
+                // Her bir digiti taşıyıcı resme göm
+                for(int i = 0; i < cipherPixel.length(); i++)
+                {
+                	int embeddingDigit = Character.getNumericValue(cipherPixel.charAt(i));
+
+			// Sifreleme tabanindaki her bir digit orten resme gomulur 
+                        embedDigit(embeddingDigit, index + (i * groupSize), band);
+                }
+	}
+	
 	private void embedDigit(int embeddingDigit, int index, int band)
 	{
 		int weightedSum = 0;
@@ -97,35 +146,6 @@ public class Encrypt
 		{
       			coverImage.setSample(column, row, band, coverImage.getSample(column, row, band) - 1);
 		} 
-	}
-
-	private void embedPixel(int column, int row, int band)
-	{
-
-		// Satir ve sutun sonu kontrollerinden kurtulmak icin tek boyutta indeksle
-		int index = (row * secretImage.getWidth() + column) * factor;
-
-		// Pikseli al ve sifreleme tabanina cevir
-                int pixel = secretImage.getSample(column, row, band);
-                String cipherPixel = Integer.toString(pixel, base);
-
-                // Gerekiyorsa padding yap
-                if(cipherPixel.length() < Integer.toString(255, base).length())
-                {
-       	        	int diff = Integer.toString(255, base).length() - cipherPixel.length();
-
-                        for(int i = 0; i < diff; i++)
-                        	cipherPixel = '0' + cipherPixel;
-                }
-
-                // Her bir digiti taşıyıcı resme göm
-                for(int i = 0; i < cipherPixel.length(); i++)
-                {
-                	int embeddingDigit = Character.getNumericValue(cipherPixel.charAt(i));
-
-			// Sifreleme tabanindaki her bir digit orten resme gomulur 
-                        embedDigit(embeddingDigit, index + (i * groupSize), band);
-                }
 	}
 	
 	public double getPSNR()
