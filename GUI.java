@@ -1,0 +1,168 @@
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+
+public class GUI extends JFrame {
+
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JMenu jMenu1;
+    private JMenu jMenu2;
+    private JMenuBar jMenuBar1;
+    private JMenuItem jMenuItem1;
+    private JMenuItem jMenuItem2;
+    private ImagePanel jPanel1;
+    private ImagePanel jPanel2;
+    private JFileChooser fileChooser;
+    
+    public GUI() {
+	setTitle("EMD Application");
+	setResizable(false);
+        initComponents();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initComponents() {
+
+        jPanel1     = new ImagePanel();
+        jPanel2     = new ImagePanel();
+        jLabel1     = new JLabel();
+        jLabel2     = new JLabel();
+        jLabel3     = new JLabel();
+        jMenuBar1   = new JMenuBar();
+        jMenu1      = new JMenu();
+        jMenuItem1  = new JMenuItem();
+        jMenu2      = new JMenu();
+        jMenuItem2  = new JMenuItem();
+	fileChooser = new JFileChooser();
+	
+	jLabel1.setVisible(false);
+	jLabel2.setVisible(false);
+	jPanel1.setVisible(false);
+	jPanel2.setVisible(false);
+  
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(new java.awt.Dimension(1000, 600));
+	setMinimumSize(new java.awt.Dimension(1000, 600));
+        getContentPane().setLayout(null);
+
+        getContentPane().add(jPanel1);
+        jPanel1.setBounds(50, 100, 400, 400);
+
+        getContentPane().add(jPanel2);
+        jPanel2.setBounds(550, 100, 400, 400);
+
+        jLabel1.setIcon(new ImageIcon(this.getClass().getResource(".//icons//input-icon.jpg"))); 
+        getContentPane().add(jLabel1);
+        jLabel1.setBounds(164, 64, 130, 30);
+
+        jLabel2.setIcon(new ImageIcon(this.getClass().getResource(".//icons//output-icon.jpg"))); 
+        getContentPane().add(jLabel2);
+        jLabel2.setBounds(674, 64, 140, 30);
+
+        jLabel3.setIcon(new ImageIcon(this.getClass().getResource(".//icons//background.jpg"))); 
+        getContentPane().add(jLabel3);
+        jLabel3.setBounds(0, 10, 1310, 570);
+
+        jMenu1.setText("Encryption");
+
+        jMenuItem1.setText("Load Image");
+	jMenuItem1.addActionListener(new ActionListener(){
+		@Override
+		public void actionPerformed(ActionEvent e){			
+                        	JOptionPane.showMessageDialog(GUI.this, "Please select the cover image");
+			        int result1 = fileChooser.showOpenDialog(GUI.this);
+				if(result1 == JFileChooser.APPROVE_OPTION){
+				File file1 = fileChooser.getSelectedFile();
+				JOptionPane.showMessageDialog(GUI.this, "Please select the secret image");
+				int result2 = fileChooser.showOpenDialog(GUI.this);
+				if(result2 == JFileChooser.APPROVE_OPTION){
+					File file2 = fileChooser.getSelectedFile();
+					try{
+						Encrypt encryption = new Encrypt(ImageIO.read(file1), ImageIO.read(file2));
+						BufferedImage output = encryption.encrypt();
+						File dest = new File(".//images//output-images//modified-cover//output.bmp");
+						ImageIO.write(output, "BMP", dest);
+						GUI.this.jPanel1.loadImage(file1);
+						GUI.this.jPanel2.loadImage(dest);
+						jLabel1.setVisible(true);
+						jLabel2.setVisible(true);
+						jPanel1.setVisible(true);
+						jPanel2.setVisible(true);
+						output = null;
+						encryption = null;
+						dest = null;
+				
+				}catch(Exception ex){
+					ex.printStackTrace();
+				} 
+				
+				}else{
+					JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", null, JOptionPane.WARNING_MESSAGE);
+				}
+			}else{
+				JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", null, JOptionPane.WARNING_MESSAGE);
+			}
+		}	
+	});
+			
+        jMenu1.add(jMenuItem1);
+	
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Decryption");
+
+        jMenuItem2.setText("Load Image");
+	jMenuItem2.addActionListener(new ActionListener(){
+		@Override
+		public void actionPerformed(ActionEvent e){
+			JOptionPane.showMessageDialog(GUI.this, "Please select the cipher image");
+			int result = fileChooser.showOpenDialog(GUI.this);	
+			if(result == JFileChooser.APPROVE_OPTION){
+				try{
+					File file1 = fileChooser.getSelectedFile();
+					File dest = new File(".//images//output-images//output-secret//secret.bmp");
+					Decrypt decryption = new Decrypt(ImageIO.read(file1));
+					BufferedImage output = decryption.decrypt();
+					ImageIO.write(output, "BMP", dest);
+					jPanel1.loadImage(file1);
+					jPanel2.loadImage(dest);
+					jLabel1.setVisible(true);
+					jLabel2.setVisible(true);
+					jPanel1.setVisible(true);
+					jPanel2.setVisible(true);
+					output = null;
+					decryption=null;
+					dest = null;
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+			}else{
+				JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", null, JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	});		
+        jMenu2.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+        pack();
+    }
+
+}
+

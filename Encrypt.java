@@ -13,7 +13,7 @@ public class Encrypt
 	private int factor;          	       	// Her bir pikselin sifrelenmesinde kullanilacak piksel sayisi
 	
 	public Encrypt(BufferedImage coverImage, BufferedImage secretImage) throws Exception
-	{
+	{	
 		this.unmodifiedImage = coverImage;
 		this.model           = coverImage.getColorModel();
 		this.coverImage      = coverImage.getRaster();
@@ -29,7 +29,7 @@ public class Encrypt
 			
 	}
 
-	public void embedSize()
+	private void embedSize()
 	{
 		String row = String.valueOf(secretImage.getHeight());
 		String column = String.valueOf(secretImage.getWidth());
@@ -38,11 +38,13 @@ public class Encrypt
 			row = "0" + row;
 		if(column.length() < 4)
 			column = "0" + column;
-
+		System.out.println(row + "\t" + column);
 		for(int i = 0; i < 4; i++)
 		{
-			coverImage.setSample(i, 0, 0, Integer.valueOf(Character.getNumericValue(row.charAt(i))));
-			coverImage.setSample(i + 4, 0, 0, Integer.valueOf(Character.getNumericValue(column.charAt(i))));
+			coverImage.setSample(i, 0, 0, Character.getNumericValue(row.charAt(i)));
+			System.out.print(coverImage.getSample(i, 0, 0) + "\t");
+			coverImage.setSample(i + 4, 0, 0, Character.getNumericValue(column.charAt(i)));
+			System.out.print(coverImage.getSample(i, 0, 0) + "\n");
 		}		 	
 	}
 
@@ -71,9 +73,9 @@ public class Encrypt
 
 	public BufferedImage encrypt()
 	{
-		for(int row = 0; row < secretImage.getHeight(); row++)
+		for(int row = 1; row < secretImage.getHeight(); row++)
 		{
-			for(int column = 0; column < secretImage.getWidth(); column++)
+			for(int column = 1; column < secretImage.getWidth(); column++)
 			{	
 				// Her bir piksel karsilik dusen band(kanal) a gomulur
 				embedPixel(column, row, 0);

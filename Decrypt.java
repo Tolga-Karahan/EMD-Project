@@ -1,11 +1,12 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
+import java.io.File;
 
 public class Decrypt	
 {
 	private WritableRaster coverImage; 	// Orten resim
-	private WritableRaster secretImage;     // Gizli resim
+	private WritableRaster secretImage;	// Gizli resim
 	private ColorModel model;		// Gizli resmin renk modeli
 	private int Width;		        // Gizli resmin sutun sayisi
 	private int Height;			// Gizli resmin satir sayisi
@@ -20,7 +21,7 @@ public class Decrypt
 
 		// Gizli resmin satir ve sutun sayisini cikart
 		extractSize();
-		
+
 		this.secretImage = new BufferedImage(Width, Height, BufferedImage.TYPE_INT_RGB).getRaster();
 		this.model       = new BufferedImage(Width, Height, BufferedImage.TYPE_INT_RGB).getColorModel();
 		this.base        = coverImage.getWidth() * coverImage.getHeight() < 
@@ -37,20 +38,23 @@ public class Decrypt
 
 		for(int i = 0; i < 4; i++)
 		{
-			row = row + coverImage.getSample(i, 0, 0);
-			column = column + coverImage.getSample(i + 4, 0, 0);
-		}
 
+			column = column + String.valueOf(coverImage.getSample(i + 4, 0, 0));
+			row    = row    + String.valueOf(coverImage.getSample(i, 0, 0));
+			System.out.println(row + "\t" + column);
+		}
+		
 		this.Width = Integer.parseInt(column);
 		this.Height = Integer.parseInt(row);
+
+		
 	}	
 
 	public BufferedImage decrypt()
 	{	
-
-		for(int row = 0; row < secretImage.getHeight(); row++)
+		for(int row = 1; row < secretImage.getHeight(); row++)
 		{
-			for(int column = 0; column < secretImage.getWidth(); column++)
+			for(int column = 1; column < secretImage.getWidth(); column++)
 			{
 				// Tek boyutta indeksle
 				int index = ((row * secretImage.getWidth() + column) + 1) * factor;
