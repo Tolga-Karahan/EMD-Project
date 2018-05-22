@@ -27,7 +27,7 @@ public class GUI extends JFrame {
     private ImagePanel jPanel1;
     private ImagePanel jPanel2;
     private JFileChooser fileChooser;
-    
+   	
     public GUI() {
 	setTitle("EMD Application");
 	setResizable(false);
@@ -93,23 +93,23 @@ public class GUI extends JFrame {
 					File file2 = fileChooser.getSelectedFile();
 					try{
 						Encrypt encryption = new Encrypt(ImageIO.read(file1), ImageIO.read(file2));
-						BufferedImage output = encryption.encrypt();
-						File dest = new File(".//images//output-images//modified-cover//output.bmp");
-						ImageIO.write(output, "BMP", dest);
+						BufferedImage modifiedCover = encryption.encrypt();
+						int saveResult = GUI.this.fileChooser.showSaveDialog(GUI.this);
+						JOptionPane.showMessageDialog(GUI.this, "Please save the file");
+						if(saveResult == JFileChooser.APPROVE_OPTION)
+							ImageIO.write(modifiedCover, "BMP", fileChooser.getSelectedFile());
 						GUI.this.jPanel1.loadImage(file1);
-						GUI.this.jPanel2.loadImage(dest);
+						GUI.this.jPanel2.loadImage(fileChooser.getSelectedFile());
 						String psnr = String.format("Encryption is successful. PSNR is: %.4f", encryption.getPSNR());	
 						JOptionPane.showMessageDialog(GUI.this,psnr);
 						jLabel1.setVisible(true);
 						jLabel2.setVisible(true);
 						jPanel1.setVisible(true);
 						jPanel2.setVisible(true);
-						output = null;
-						encryption = null;
-						dest = null;
-				
+							
 				}catch(Exception ex){
-					ex.printStackTrace();
+					String errorMessage = ex.getMessage();
+					JOptionPane.showMessageDialog(GUI.this, errorMessage, null, JOptionPane.WARNING_MESSAGE);
 				} 
 				
 				}else{
@@ -138,9 +138,13 @@ public class GUI extends JFrame {
 				try{
 					File file1 = fileChooser.getSelectedFile();
 					Decrypt decryption = new Decrypt(ImageIO.read(file1));
-					ImageIO.write(decryption.decrypt(),"BMP", new File(".//images//output-images//output-secret//secret.bmp"));
+					BufferedImage secretImage = decryption.decrypt();
+					JOptionPane.showMessageDialog(GUI.this, "Please save the file");
+					int saveResult = fileChooser.showSaveDialog(GUI.this);
+					if(saveResult == JFileChooser.APPROVE_OPTION)
+						ImageIO.write(decryption.decrypt(),"BMP", fileChooser.getSelectedFile());
 					jPanel1.loadImage(file1);
-					jPanel2.loadImage(new File(".//images//output-images//output-secret//secret.bmp"));
+					jPanel2.loadImage(fileChooser.getSelectedFile());
 					jLabel1.setVisible(true);
 					jLabel2.setVisible(true);
 					jPanel1.setVisible(true);
