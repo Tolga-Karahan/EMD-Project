@@ -41,7 +41,6 @@ public class Decrypt
 
 			column = column + String.valueOf(coverImage.getSample(i + 4, 0, 0));
 			row    = row    + String.valueOf(coverImage.getSample(i, 0, 0));
-			System.out.println(row + "\t" + column);
 		}
 		
 		this.Width = Integer.parseInt(column);

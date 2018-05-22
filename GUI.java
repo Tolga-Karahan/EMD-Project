@@ -98,6 +98,8 @@ public class GUI extends JFrame {
 						ImageIO.write(output, "BMP", dest);
 						GUI.this.jPanel1.loadImage(file1);
 						GUI.this.jPanel2.loadImage(dest);
+						String psnr = String.format("Encryption is successful. PSNR is: %.4f", encryption.getPSNR());	
+						JOptionPane.showMessageDialog(GUI.this,psnr);
 						jLabel1.setVisible(true);
 						jLabel2.setVisible(true);
 						jPanel1.setVisible(true);
@@ -135,19 +137,14 @@ public class GUI extends JFrame {
 			if(result == JFileChooser.APPROVE_OPTION){
 				try{
 					File file1 = fileChooser.getSelectedFile();
-					File dest = new File(".//images//output-images//output-secret//secret.bmp");
 					Decrypt decryption = new Decrypt(ImageIO.read(file1));
-					BufferedImage output = decryption.decrypt();
-					ImageIO.write(output, "BMP", dest);
+					ImageIO.write(decryption.decrypt(),"BMP", new File(".//images//output-images//output-secret//secret.bmp"));
 					jPanel1.loadImage(file1);
-					jPanel2.loadImage(dest);
+					jPanel2.loadImage(new File(".//images//output-images//output-secret//secret.bmp"));
 					jLabel1.setVisible(true);
 					jLabel2.setVisible(true);
 					jPanel1.setVisible(true);
 					jPanel2.setVisible(true);
-					output = null;
-					decryption=null;
-					dest = null;
 				}catch(Exception ex){
 					ex.printStackTrace();
 				}

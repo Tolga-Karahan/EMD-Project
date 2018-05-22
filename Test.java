@@ -9,7 +9,7 @@ public class Test
 		try
 		{
 			BufferedImage input = ImageIO.read(new File(
-				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//secret//rgbinput.jpg"));
+				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//secret//input.jpg"));
 			BufferedImage coverImage = ImageIO.read(new File(
 				"//home//apeiron//Documents//myRepos//EMD-Project//images//input-images//cover//cover-image.jpg"));
 

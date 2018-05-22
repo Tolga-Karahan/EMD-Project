@@ -1,11 +1,12 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.awt.image.ColorModel;
+import java.awt.image.*;
+import java.awt.Point;
 
 public class Encrypt
 { 
 	private BufferedImage unmodifiedImage;  // PSNR hesaplamak icin resmin ilk halini kaydet
-	private ColorModel model;		// Orten resmin renk modeli
+	private BufferedImage modifiedImage;    // Orten resmin degismis hali
 	private WritableRaster coverImage;      // Orten resim
 	private WritableRaster secretImage;     // Gizli resim
 	private int base;        	       	// (2n+1) sifreleme tabani
@@ -15,8 +16,9 @@ public class Encrypt
 	public Encrypt(BufferedImage coverImage, BufferedImage secretImage) throws Exception
 	{	
 		this.unmodifiedImage = coverImage;
-		this.model           = coverImage.getColorModel();
-		this.coverImage      = coverImage.getRaster();
+		this.modifiedImage   = new BufferedImage(coverImage.getWidth(), coverImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+		this.modifiedImage.setData(coverImage.getRaster());  
+		this.coverImage      = modifiedImage.getRaster();
 		this.secretImage     = secretImage.getRaster();
 
 		if(!isSizeSufficient())
@@ -38,13 +40,11 @@ public class Encrypt
 			row = "0" + row;
 		if(column.length() < 4)
 			column = "0" + column;
-		System.out.println(row + "\t" + column);
+		
 		for(int i = 0; i < 4; i++)
 		{
 			coverImage.setSample(i, 0, 0, Character.getNumericValue(row.charAt(i)));
-			System.out.print(coverImage.getSample(i, 0, 0) + "\t");
 			coverImage.setSample(i + 4, 0, 0, Character.getNumericValue(column.charAt(i)));
-			System.out.print(coverImage.getSample(i, 0, 0) + "\n");
 		}		 	
 	}
 
@@ -84,7 +84,7 @@ public class Encrypt
 	 		}
 		}
 
-		return new BufferedImage(model, coverImage, model.isAlphaPremultiplied(), null); 
+		return modifiedImage; 
 	}
 
 	private void embedPixel(int column, int row, int band)
@@ -120,6 +120,7 @@ public class Encrypt
 	{
 		int weightedSum = 0;
 		int difference;
+		WritableRaster unmodifiedImageRaster= unmodifiedImage.getRaster();
 		
 		// Fonksiyonun sonucunu hesapla
 		for(int i = 0; i < groupSize; i++)
@@ -142,11 +143,11 @@ public class Encrypt
 		// Fark n den kucukse ilgili pikseli arttir, n den buyukse ilgili pikseli azalt
 		if(difference <= groupSize)
 		{
-			coverImage.setSample(column, row, band, coverImage.getSample(column, row, band) + 1);
+			coverImage.setSample(column, row, band, (unmodifiedImageRaster.getSample(column, row, band) + 1));
 		}
 		else
 		{
-      			coverImage.setSample(column, row, band, coverImage.getSample(column, row, band) - 1);
+      			coverImage.setSample(column, row, band, (unmodifiedImageRaster.getSample(column, row, band) - 1));
 		} 
 	}
 	
