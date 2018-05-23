@@ -25,6 +25,7 @@ public class GUI extends JFrame {
     private JMenu jMenu1;
     private JMenu jMenu2;
     private JMenu helpMenu;	
+    private JMenu aboutMenu;	
     private JMenuBar jMenuBar1;
     private JMenuItem jMenuItem1;
     private JMenuItem jMenuItem2;
@@ -53,6 +54,7 @@ public class GUI extends JFrame {
         jMenu2      = new JMenu();
         jMenuItem2  = new JMenuItem();
 	helpMenu    = new JMenu();
+	aboutMenu   = new JMenu();
 	fileChooser = new JFileChooser();
 	helpString  = String.format("1.%s%n2.%s%n3.%s%n",
 		"You can use Encryption menu to hide images",
@@ -188,7 +190,26 @@ public class GUI extends JFrame {
 		public void menuCanceled(MenuEvent e){}
 		
 	});
-	jMenuBar1.add(helpMenu);		
+	jMenuBar1.add(helpMenu);
+
+	aboutMenu.setText("About");
+	aboutMenu.addMenuListener(new MenuListener(){
+                @Override
+                public void menuSelected(MenuEvent e){
+                        JOptionPane.showMessageDialog(GUI.this, 
+				"It's a steganography project developed by Tolga Karahan and Mahsum Yatki",
+			        "About",
+			        JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                @Override
+                public void menuDeselected(MenuEvent e){}
+
+                @Override
+                public void menuCanceled(MenuEvent e){}
+
+        });
+	jMenuBar1.add(aboutMenu);	
 	
         setJMenuBar(jMenuBar1);
         pack();
