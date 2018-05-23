@@ -6,6 +6,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MenuEvent;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,13 +24,15 @@ public class GUI extends JFrame {
     private JLabel jLabel3;
     private JMenu jMenu1;
     private JMenu jMenu2;
+    private JMenu helpMenu;	
     private JMenuBar jMenuBar1;
     private JMenuItem jMenuItem1;
     private JMenuItem jMenuItem2;
     private ImagePanel jPanel1;
     private ImagePanel jPanel2;
     private JFileChooser fileChooser;
-   	
+    private String helpString;	   	
+
     public GUI() {
 	setTitle("EMD Application");
 	setResizable(false);
@@ -47,8 +52,13 @@ public class GUI extends JFrame {
         jMenuItem1  = new JMenuItem();
         jMenu2      = new JMenu();
         jMenuItem2  = new JMenuItem();
+	helpMenu    = new JMenu();
 	fileChooser = new JFileChooser();
-	
+	helpString  = String.format("1.%s%n2.%s%n3.%s%n",
+		"You can use Encryption menu to hide images",
+		"You can use Decryption menu to extract images",
+		"Please store images in proper directories and provide correct inputs to the app"); 	
+
 	jLabel1.setVisible(false);
 	jLabel2.setVisible(false);
 	jPanel1.setVisible(false);
@@ -94,8 +104,9 @@ public class GUI extends JFrame {
 					try{
 						Encrypt encryption = new Encrypt(ImageIO.read(file1), ImageIO.read(file2));
 						BufferedImage modifiedCover = encryption.encrypt();
+					        JOptionPane.showMessageDialog(GUI.this, 
+							"Please save the file. You can provide any extension but we'll save this as bmp anyway!");
 						int saveResult = GUI.this.fileChooser.showSaveDialog(GUI.this);
-						JOptionPane.showMessageDialog(GUI.this, "Please save the file");
 						if(saveResult == JFileChooser.APPROVE_OPTION)
 							ImageIO.write(modifiedCover, "BMP", fileChooser.getSelectedFile());
 						GUI.this.jPanel1.loadImage(file1);
@@ -139,10 +150,12 @@ public class GUI extends JFrame {
 					File file1 = fileChooser.getSelectedFile();
 					Decrypt decryption = new Decrypt(ImageIO.read(file1));
 					BufferedImage secretImage = decryption.decrypt();
-					JOptionPane.showMessageDialog(GUI.this, "Please save the file");
+					JOptionPane.showMessageDialog(GUI.this, 
+						"Please save the file!");
 					int saveResult = fileChooser.showSaveDialog(GUI.this);
-					if(saveResult == JFileChooser.APPROVE_OPTION)
+					if(saveResult == JFileChooser.APPROVE_OPTION){
 						ImageIO.write(decryption.decrypt(),"BMP", fileChooser.getSelectedFile());
+					}
 					jPanel1.loadImage(file1);
 					jPanel2.loadImage(fileChooser.getSelectedFile());
 					jLabel1.setVisible(true);
@@ -160,7 +173,23 @@ public class GUI extends JFrame {
         jMenu2.add(jMenuItem2);
 
         jMenuBar1.add(jMenu2);
-
+	
+	helpMenu.setText("Help");
+	helpMenu.addMenuListener(new MenuListener(){
+		@Override
+		public void menuSelected(MenuEvent e){
+			JOptionPane.showMessageDialog(GUI.this, helpString, "Help", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		@Override
+		public void menuDeselected(MenuEvent e){}
+		
+		@Override
+		public void menuCanceled(MenuEvent e){}
+		
+	});
+	jMenuBar1.add(helpMenu);		
+	
         setJMenuBar(jMenuBar1);
         pack();
     }
