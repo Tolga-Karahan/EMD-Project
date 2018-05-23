@@ -56,10 +56,11 @@ public class GUI extends JFrame {
 	helpMenu    = new JMenu();
 	aboutMenu   = new JMenu();
 	fileChooser = new JFileChooser();
-	helpString  = String.format("1.%s%n2.%s%n3.%s%n",
+	helpString  = String.format("1.%s%n2.%s%n3.%s%n4.%s",
 		"You can use Encryption menu to hide images",
 		"You can use Decryption menu to extract images",
-		"Please store images in proper directories and provide correct inputs to the app"); 	
+		"You can use both  gray and  color images",
+		"Sample images are provided in images directory"); 	
 
 	jLabel1.setVisible(false);
 	jLabel2.setVisible(false);
@@ -126,10 +127,10 @@ public class GUI extends JFrame {
 				} 
 				
 				}else{
-					JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", null, JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
 			}else{
-				JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", null, JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", "Warning", JOptionPane.WARNING_MESSAGE);
 			}
 		}	
 	});
@@ -168,7 +169,7 @@ public class GUI extends JFrame {
 					ex.printStackTrace();
 				}
 			}else{
-				JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", null, JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(GUI.this, "Selection failed, try again", "Warning", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	});		
@@ -198,7 +199,7 @@ public class GUI extends JFrame {
                 public void menuSelected(MenuEvent e){
                         JOptionPane.showMessageDialog(GUI.this, 
 				"It's a steganography project developed by Tolga Karahan and Mahsum Yatki",
-			        "About",
+				"About",	
 			        JOptionPane.INFORMATION_MESSAGE);
                 }
 
