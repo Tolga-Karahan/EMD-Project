@@ -96,7 +96,8 @@ public class GUI extends JFrame {
 	jMenuItem1.addActionListener(new ActionListener(){
 		@Override
 		public void actionPerformed(ActionEvent e){			
-                        	JOptionPane.showMessageDialog(GUI.this, "Please select the cover image");
+                        	
+				JOptionPane.showMessageDialog(GUI.this, "Please select the cover image");
 			        int result1 = fileChooser.showOpenDialog(GUI.this);
 				if(result1 == JFileChooser.APPROVE_OPTION){
 				File file1 = fileChooser.getSelectedFile();

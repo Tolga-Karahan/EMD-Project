@@ -31,6 +31,7 @@ public class Decrypt
 		this.factor 	 = base == 5 ? 8 : 9;
 	}
 	
+	// Gizli resmin satir ve sutun sayisini cikartir
 	public void extractSize()
 	{
 		String row = "";
@@ -75,6 +76,7 @@ public class Decrypt
 		return new BufferedImage(model, secretImage, model.isAlphaPremultiplied(), null);
 	}
 	
+	// Fonksiyon ile sifreleme tabanindaki her bir digit cikartilir
 	private int extractionFunction(int index, int band)
 	{
 		int weightedSum = 0;
