@@ -1,6 +1,6 @@
 public class Decrypt
 {
-	img coverImage; // orten resim
+	img coverImage;  // orten resim
 	img secretImage; // gizli resim
 	int base; // sifrelenirken kullanilan taban
 	int groupSize; // grup buyuklugu
