@@ -1,5 +1,6 @@
 public class Encrypt
 {
+
 	img coverImage;      // Orten resim
 	img secretImage;     // Gizli resim
 	int base;            // (2n+1) sifreleme tabani
